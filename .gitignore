@@ -71,11 +71,3 @@ Thumbs.db
 *.dll
 *.exe
 
-MacSERomPatch.cflags
-MacSERomPatch.config
-MacSERomPatch.creator
-MacSERomPatch.cxxflags
-MacSERomPatch.files
-MacSERomPatch.includes
-MacSERomPatch.creator.user
-build/

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const string FILE_NAME = "/home/Ricky/repo/github/MacSERomPatch/MacSE-Dispatch-Table.compressed";
+const string FILE_NAME = "/Users/Ricky/repo/github/MacSERomPatch/MacSE-Dispatch-Table.compressed";
 
 shared_ptr<vector<uint8_t>> getCompressedDisptachData()
 {
