@@ -109,7 +109,7 @@ void initDispatchTable(shared_ptr<vector<uint8_t>> pVec)
 		if (d1 >= 0x80)
 		{
 			d1 = d1 & d2;
-			if (0x80 == d1)
+			if (0 == d1)
 			{
 				// skip
 				goto Next_Address;
