@@ -3,14 +3,29 @@
 #include <vector>
 #include <memory>
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
 
 using namespace std;
 
-const string FILE_NAME = "/Users/Ricky/repo/github/MacSERomPatch/MacSE-Dispatch-Table.compressed";
+const string REL_FILE_PATH = "/repo/github/MacSERomPatch/MacSE-Dispatch-Table.compressed";
+
+string getHomeDir()
+{
+
+	struct passwd *pw = getpwuid(getuid());
+
+	return string(pw->pw_dir);
+}
 
 shared_ptr<vector<uint8_t>> getCompressedDisptachData()
 {
-	fstream is(FILE_NAME.c_str(), ios::in | ios::binary);
+	string filePath(getHomeDir());
+	filePath +=REL_FILE_PATH;
+
+	fstream is(filePath.c_str(), ios::in | ios::binary);
 	if (!is)
 	{
 		return nullptr;
