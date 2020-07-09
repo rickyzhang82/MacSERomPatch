@@ -3,67 +3,16 @@
 #include <vector>
 #include <memory>
 #include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
 
+#define DEBUG 1
+#include "common.h"
 
 using namespace std;
-
-const string REL_FILE_PATH = "/repo/github/qt-MacSERomPatch/MacSERomPatch/MacSE-Dispatch-Table.compressed";
-
-string getHomeDir()
-{
-	struct passwd *pw = getpwuid(getuid());
-	return string(pw->pw_dir);
-}
-
-string getCompressedDataFilePath()
-{
-	string filePath(getHomeDir());
-	filePath +=REL_FILE_PATH;
-	return filePath;
-}
-
-shared_ptr<vector<uint8_t>> getCompressedDisptachData()
-{
-	auto filePath = getCompressedDataFilePath();
-	fstream is(filePath.c_str(), ios::in | ios::binary);
-	if (!is)
-	{
-		return nullptr;
-	}
-	// get length of file:
-	is.seekg (0, is.end);
-	int length = is.tellg();
-	is.seekg (0, is.beg);
-
-	char * buffer = new char [length];
-
-	cout << "Reading " << length << " bytes... " << endl;
-	// read data as a block:
-	is.read (buffer,length);
-
-	if (is)
-		std::cout << "all characters read successfully." << endl;
-	else
-		std::cout << "error: only " << is.gcount() << " could be read";
-
-	auto pVec = make_shared<vector<uint8_t>>();
-	for (int i = 0; i < length; i++)
-	{
-		pVec->push_back(static_cast<uint8_t>(buffer[i]));
-	}
-	delete[] buffer;
-	is.close();
-	return pVec;
-
-}
 
 uint32_t readOneByte(uint32_t d1, shared_ptr<vector<uint8_t>> pVec, int& index)
 {
 	d1 = d1 & 0xFFFFFF00; // clear lower one byte
-	d1 = d1 + pVec->at(index++);
+	d1 = d1 | pVec->at(index++);
 	return d1;
 }
 
@@ -113,7 +62,7 @@ void initDispatchTable(shared_ptr<vector<uint8_t>> pVec)
 	{
 		//loc 710
 		d1 = readOneByte(d1, pVec, index);
-		if (d1 >= 0x80)
+		if ((d1 & 0x80) == 0x80)
 		{
 			d1 = d1 & d2;
 			if (0 == d1)
@@ -171,12 +120,18 @@ Update_Address:
 		if (isToolBoxTraps)
 		{
 			if (a1/4 >= toolboxTraps.size())
+			{
+				printf("Error: Read access violation on the toolbox traps array!");
 				break;
+			}
 			toolboxTraps.at(a1/4)=a2;
 		} else
 		{
 			if (a1/4 >= osTraps.size())
+			{
+				printf("Error: Read access violation on the OS traps array!");
 				break;
+			}
 			osTraps.at(a1/4) = a2;
 		}
 		//loc_722
@@ -198,7 +153,7 @@ Next_Address:
 
 int main()
 {
-	auto pDataVec = getCompressedDisptachData();
+	auto pDataVec = getCompressedDisptachData(getCompressedDataFilePath());
 	if (nullptr == pDataVec)
 	{
 		printf("Failed to read compressed data file: %s.\n", getCompressedDataFilePath().c_str());
