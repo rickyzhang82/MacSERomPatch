@@ -70,9 +70,13 @@ uint32_t readOneByte(uint32_t d1, shared_ptr<vector<uint8_t>> pVec, int& index)
 void printTraps(vector<uint32_t>& traps, const char* msg)
 {
 	cout << msg << endl;
+	int index = 0;
 	for (auto it = traps.begin(); it != traps.end(); it++)
 	{
-		printf("0x%08X\n", *it);
+		printf("%08X ", *it);
+		if (3 == index % 4)
+			printf("\n");
+		++index;
 	}
 	cout << "END!" << endl << endl;
 }
@@ -99,7 +103,7 @@ void initDispatchTable(shared_ptr<vector<uint8_t>> pVec)
 		osTraps.push_back(UNIMPLEMNTED_TRAP_ADDR);
 
 	for (int i = 0; i < numToolBoxTraps; i++)
-		osTraps.push_back(UNIMPLEMNTED_TRAP_ADDR);
+		toolboxTraps.push_back(UNIMPLEMNTED_TRAP_ADDR);
 
 	d0 = 0x200;
 	d2 = 0x7F;
@@ -121,7 +125,7 @@ void initDispatchTable(shared_ptr<vector<uint8_t>> pVec)
 				// d1 != 0x80
 				if (d1 == 0x7F)
 				{
-					for (int i = 0; i < 3; i++)
+					for (int i = 0; i < 4; i++)
 					{
 						d1 = d1 << 8;
 						d1 = readOneByte(d1, pVec, index);
@@ -165,14 +169,23 @@ void initDispatchTable(shared_ptr<vector<uint8_t>> pVec)
 Update_Address:
 		a2 = a2 + d1;
 		if (isToolBoxTraps)
-			toolboxTraps.push_back(a2);
-		else
-			osTraps.push_back(a2);
+		{
+			if (a1/4 >= toolboxTraps.size())
+				break;
+			toolboxTraps.at(a1/4)=a2;
+		} else
+		{
+			if (a1/4 >= osTraps.size())
+				break;
+			osTraps.at(a1/4) = a2;
+		}
 		//loc_722
 Next_Address:
 		d0 = d0 - 1;
+		a1 = a1 + 4;
 		if (d0 == 0)
 		{
+			a1 = 0;
 			d0 = 0xFFFFFFFF;
 			isToolBoxTraps = false;
 		}
