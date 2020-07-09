@@ -10,21 +10,24 @@
 
 using namespace std;
 
-const string REL_FILE_PATH = "/repo/github/MacSERomPatch/MacSE-Dispatch-Table.compressed";
+const string REL_FILE_PATH = "/repo/github/qt-MacSERomPatch/MacSERomPatch/MacSE-Dispatch-Table.compressed";
 
 string getHomeDir()
 {
-
 	struct passwd *pw = getpwuid(getuid());
-
 	return string(pw->pw_dir);
+}
+
+string getCompressedDataFilePath()
+{
+	string filePath(getHomeDir());
+	filePath +=REL_FILE_PATH;
+	return filePath;
 }
 
 shared_ptr<vector<uint8_t>> getCompressedDisptachData()
 {
-	string filePath(getHomeDir());
-	filePath +=REL_FILE_PATH;
-
+	auto filePath = getCompressedDataFilePath();
 	fstream is(filePath.c_str(), ios::in | ios::binary);
 	if (!is)
 	{
@@ -183,6 +186,11 @@ Next_Address:
 int main()
 {
 	auto pDataVec = getCompressedDisptachData();
+	if (nullptr == pDataVec)
+	{
+		printf("Failed to read compressed data file: %s.\n", getCompressedDataFilePath().c_str());
+		return 1;
+	}
 	initDispatchTable(pDataVec);
 	return 0;
 }
