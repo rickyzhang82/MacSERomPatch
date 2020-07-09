@@ -151,9 +151,15 @@ Next_Address:
 	printTraps(osTraps, "OS Traps");
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	auto pDataVec = getCompressedDisptachData(getCompressedDataFilePath());
+	string filePath;
+	if (1 == argc)
+		filePath=getCompressedDataFilePath();
+	else if (2 == argc)
+		filePath=string(argv[1]);
+
+	auto pDataVec = getCompressedDisptachData(filePath);
 	if (nullptr == pDataVec)
 	{
 		printf("Failed to read compressed data file: %s.\n", getCompressedDataFilePath().c_str());

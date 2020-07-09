@@ -1,6 +1,6 @@
 #include "common.h"
 
-const string REL_FILE_PATH = "/repo/github/qt-MacSERomPatch/MacSERomPatch/MacSE-Dispatch-Table.compressed";
+const string REL_FILE_PATH = "/repo/github/qt-MacSERomPatch/MacSERomPatch/data/MacSE-Dispatch-Table.compressed";
 
 string getHomeDir()
 {
