@@ -27,7 +27,7 @@ shared_ptr<vector<uint8_t>> getCompressedDisptachData()
 	is.read (buffer,length);
 
 	if (is)
-		std::cout << "all characters read successfully.";
+		std::cout << "all characters read successfully." << endl;
 	else
 		std::cout << "error: only " << is.gcount() << " could be read";
 
@@ -54,7 +54,7 @@ void printTraps(vector<uint32_t>& traps, const char* msg)
 	cout << msg << endl;
 	for (auto it = traps.begin(); it != traps.end(); it++)
 	{
-		printf("0x%08X", *it);
+		printf("0x%08X\n", *it);
 	}
 	cout << "END!" << endl << endl;
 }
@@ -168,6 +168,7 @@ Next_Address:
 int main()
 {
 	auto pDataVec = getCompressedDisptachData();
+	initDispatchTable(pDataVec);
 	return 0;
 }
 
